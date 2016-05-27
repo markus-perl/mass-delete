@@ -14,6 +14,7 @@ if (!isset($argv[1])) {
 
 $dir = $argv[1];
 $count = 0;
+$bytesDeleted = 0;
 $delay = 10;
 
 if (isset($argv[2])) {
@@ -30,13 +31,12 @@ if (!is_dir($dir)) {
 
 function delete(SplFileInfo $dir)
 {
-    global $count, $delay;
-
+    global $count, $delay, $bytesDeleted;
 
     echo $dir->getRealPath() . PHP_EOL;
 
     if ($count) {
-        echo "Files removed: $count" . PHP_EOL;
+        echo "Files removed: $count, MB deleted: " . round($bytesDeleted / 1024 / 1024, 2)  . PHP_EOL;
     }
 
     foreach (new DirectoryIterator($dir->getRealPath()) as $fileInfo) {
@@ -90,11 +90,14 @@ function removeDir(SplFileInfo $dir)
 
 function removeFile(SplFileInfo $file)
 {
+    global $count, $bytesDeleted;
+
+    $bytesDeleted += $file->getSize();
+
     if (!unlink($file->getRealPath())) {
         echo "failed to delete file $file";
         exit(1);
     }
 
-    global $count;
     $count++;
 }
