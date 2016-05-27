@@ -1,0 +1,100 @@
+#!/usr/bin/php
+<?php
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+ini_set('memory_limit', '256M');
+set_time_limit(-1);
+$version = 0.1;
+
+showHeader();
+
+if (!isset($argv[1])) {
+    showUsage();
+}
+
+$dir = $argv[1];
+$count = 0;
+$delay = 10;
+
+if (isset($argv[2])) {
+    $delay = (int)$argv[2];
+}
+
+if (!is_dir($dir)) {
+    showUsage();
+} else {
+    echo "Delete Operations are delayed by " . $delay . "ms" . PHP_EOL;
+    echo PHP_EOL;
+    delete(new SplFileInfo($dir));
+}
+
+function delete(SplFileInfo $dir)
+{
+    global $count, $delay;
+
+
+    echo $dir->getRealPath() . PHP_EOL;
+
+    if ($count) {
+        echo "Files removed: $count" . PHP_EOL;
+    }
+
+    foreach (new DirectoryIterator($dir->getRealPath()) as $fileInfo) {
+        if ($fileInfo->isDot()) continue;
+
+        if ($fileInfo->isDir()) {
+            delete($fileInfo);
+            echo PHP_EOL;
+        }
+
+        if ($fileInfo->isFile()) {
+            echo ".";
+            removeFile($fileInfo);
+            usleep($delay * 1000);
+        }
+    }
+
+    removeDir($dir);
+}
+
+function showUsage()
+{
+    global $argv;
+    echo "Usage: " . $argv[0] . " <target folder> <delay in ms between delete operations>" . PHP_EOL;
+    exit(1);
+}
+
+function showHeader()
+{
+    global $version;
+
+    echo PHP_EOL;
+    echo "mass-delete v$version - Markus Perl 2016" . PHP_EOL;
+    echo "=====================================" . PHP_EOL;
+    echo "Project Home: https://github.com/markus-perl/mass-delete" . PHP_EOL;
+    echo "License: https://github.com/markus-perl/mass-delete/LICENSE" . PHP_EOL;
+    echo "=====================================" . PHP_EOL;
+    echo PHP_EOL;
+}
+
+function removeDir(SplFileInfo $dir)
+{
+    if (!rmdir($dir->getRealPath())) {
+        echo "Failed to delete folder " . $dir->getRealPath();
+        exit(1);
+    }
+
+    global $count;
+    $count++;
+}
+
+function removeFile(SplFileInfo $file)
+{
+    if (!unlink($file->getRealPath())) {
+        echo "failed to delete file $file";
+        exit(1);
+    }
+
+    global $count;
+    $count++;
+}
