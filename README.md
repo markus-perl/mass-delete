@@ -24,11 +24,18 @@ Installation and Downloads
 
 Run the following command to install the script:
 
-	sudo curl -O /usr/bin/mass-delete \
+##with sudo installed
+
+	sudo curl -o /usr/bin/mass-delete \
 	https://raw.githubusercontent.com/markus-perl/mass-delete/master/mass-delete \
 	&& sudo chmod +x /usr/bin/mass-delete
 
+##as root without sudo installed
 
+	curl -o /usr/bin/mass-delete \
+	https://raw.githubusercontent.com/markus-perl/mass-delete/master/mass-delete \
+	&& chmod +x /usr/bin/mass-delete
+	
 Usage
 -----
 
