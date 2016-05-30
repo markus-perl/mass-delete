@@ -33,8 +33,6 @@ function delete(SplFileInfo $dir)
 {
     global $count, $delay, $bytesDeleted;
 
-    echo $dir->getRealPath() . PHP_EOL;
-
     if ($count) {
         echo "Files removed: $count, MB deleted: " . round($bytesDeleted / 1024 / 1024, 2) . PHP_EOL;
     }
