@@ -36,7 +36,7 @@ function delete(SplFileInfo $dir)
     echo $dir->getRealPath() . PHP_EOL;
 
     if ($count) {
-        echo "Files removed: $count, MB deleted: " . round($bytesDeleted / 1024 / 1024, 2)  . PHP_EOL;
+        echo "Files removed: $count, MB deleted: " . round($bytesDeleted / 1024 / 1024, 2) . PHP_EOL;
     }
 
     foreach (new DirectoryIterator($dir->getRealPath()) as $fileInfo) {
@@ -47,7 +47,7 @@ function delete(SplFileInfo $dir)
             echo PHP_EOL;
         }
 
-        if ($fileInfo->isFile()) {
+        if ($fileInfo->isFile() || $fileInfo->isLink()) {
             echo ".";
             removeFile($fileInfo);
             usleep($delay * 1000);
@@ -92,9 +92,11 @@ function removeFile(SplFileInfo $file)
 {
     global $count, $bytesDeleted;
 
-    $bytesDeleted += $file->getSize();
+    if ($file->isFile()) {
+        $bytesDeleted += $file->getSize();
+    }
 
-    if (!unlink($file->getRealPath())) {
+    if (!unlink($file->getPath() . '/' . $file->getFilename())) {
         echo "failed to delete file $file";
         exit(1);
     }
