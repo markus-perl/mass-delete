@@ -33,6 +33,8 @@ function delete(SplFileInfo $dir)
 {
     global $count, $delay, $bytesDeleted;
 
+    echo $dir->getRealPath() . PHP_EOL;
+
     if ($count) {
         echo "Files removed: $count, MB deleted: " . round($bytesDeleted / 1024 / 1024, 2) . PHP_EOL;
     }
@@ -40,16 +42,17 @@ function delete(SplFileInfo $dir)
     foreach (new DirectoryIterator($dir->getRealPath()) as $fileInfo) {
         if ($fileInfo->isDot()) continue;
 
-        if ($fileInfo->isDir()) {
-            delete($fileInfo);
-            echo PHP_EOL;
-        }
-
-        if ($fileInfo->isFile() || $fileInfo->isLink()) {
+    	if ($fileInfo->isFile() || $fileInfo->isLink()) {
             echo ".";
             removeFile($fileInfo);
             usleep($delay * 1000);
         }
+
+        if ($fileInfo->isDir()) {
+            delete($fileInfo);
+            echo PHP_EOL;
+        }
+    
     }
 
     removeDir($dir);
